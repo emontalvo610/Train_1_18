@@ -17,8 +17,8 @@ export default function Welcome({ onDismiss }: WelcomeProps) {
         Welcome to TodoApp! 🎉
       </h3>
       <p className="text-gray-600 mt-2">
-        We've created your first todo item to help you get started. Check your
-        todo list to begin!
+        We&apos;ve created your first todo item to help you get started. Check
+        your todo list to begin!
       </p>
       <button
         onClick={onDismiss}
