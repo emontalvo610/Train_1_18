@@ -1,51 +1,75 @@
-/* eslint-disable  @typescript-eslint/no-explicit-any */
-
-import { getServerSession } from "next-auth";
+// app/api/todos/[id]/route.ts
 import { NextResponse } from "next/server";
-import { todos } from "../data";
+import { getServerSession } from "next-auth";
+import dbConnect from "@/app/lib/mongodb";
+import Todo from "@/app/lib/model/Todo";
 
-export async function PUT(request: Request, params: any) {
-  const { id: paramsId } = await params;
-  const session = await getServerSession();
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const paramId = (await params).id;
+  try {
+    const session = await getServerSession();
 
-  if (!session?.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    await dbConnect();
+
+    const body = await request.json();
+    const { title, description, completed } = body;
+
+    const updatedTodo = await Todo.findOneAndUpdate(
+      { _id: paramId, userId: session.user.email },
+      { title, description, completed },
+      { new: true }
+    );
+
+    if (!updatedTodo) {
+      return NextResponse.json({ error: "Todo not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(updatedTodo);
+  } catch (error) {
+    console.error("Error updating todo:", error);
+    return NextResponse.json(
+      { error: "Failed to update todo" },
+      { status: 500 }
+    );
   }
-
-  const { title, description } = await request.json();
-  const todoIndex = todos.findIndex(
-    (todo) => todo.id === paramsId && todo.userId === session.user?.email
-  );
-
-  if (todoIndex === -1) {
-    return NextResponse.json({ error: "Todo not found" }, { status: 404 });
-  }
-
-  todos[todoIndex] = {
-    ...todos[todoIndex],
-    title,
-    description,
-  };
-
-  return NextResponse.json(todos[todoIndex]);
 }
 
-export async function DELETE(request: Request, params: any) {
-  const { id: paramsId } = await params;
-  const session = await getServerSession();
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const paramId = (await params).id;
+  try {
+    const session = await getServerSession();
 
-  if (!session?.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    await dbConnect();
+
+    const deletedTodo = await Todo.findOneAndDelete({
+      _id: paramId,
+      userId: session.user.email,
+    });
+
+    if (!deletedTodo) {
+      return NextResponse.json({ error: "Todo not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: "Todo deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting todo:", error);
+    return NextResponse.json(
+      { error: "Failed to delete todo" },
+      { status: 500 }
+    );
   }
-
-  const todoIndex = todos.findIndex(
-    (todo) => todo.id === paramsId && todo.userId === session.user?.email
-  );
-
-  if (todoIndex === -1) {
-    return NextResponse.json({ error: "Todo not found" }, { status: 404 });
-  }
-
-  todos.splice(todoIndex, 1);
-  return NextResponse.json({ message: "Todo deleted" });
 }

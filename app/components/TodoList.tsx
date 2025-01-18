@@ -29,11 +29,11 @@ export default function TodoList() {
       }
 
       const data = await response.json();
-      setTodos(data.todos); // Access the todos array from the response
+      setTodos(data); // Access the todos array from the response
 
       // Check if this is a new user (has only the default todo)
       if (
-        data.todos.length === 1 &&
+        data?.todos?.length === 1 &&
         data.todos[0].title.includes("Welcome to TodoApp")
       ) {
         setIsNewUser(true);
@@ -100,6 +100,7 @@ export default function TodoList() {
     );
   }
 
+  console.log({ todos });
   return (
     <div className="space-y-4">
       {error && (
@@ -139,14 +140,14 @@ export default function TodoList() {
       </form>
 
       <div className="grid gap-4">
-        {todos.length === 0 ? (
+        {todos?.length === 0 || !todos ? (
           <p className="text-center text-gray-500 py-8">
             No todos yet. Create your first todo above!
           </p>
         ) : (
-          todos.map((todo) => (
+          todos?.map((todo) => (
             <div
-              key={todo.id}
+              key={todo._id}
               className="p-4 border rounded shadow-sm hover:shadow-md transition-shadow"
             >
               <h3 className="font-bold">{todo.title}</h3>
@@ -154,7 +155,7 @@ export default function TodoList() {
               <div className="mt-2 flex gap-2">
                 <button
                   onClick={() => {
-                    setIsEditing(todo.id);
+                    setIsEditing(todo._id);
                     setNewTodo({
                       title: todo.title,
                       description: todo.description,
@@ -166,7 +167,7 @@ export default function TodoList() {
                   Edit
                 </button>
                 <button
-                  onClick={() => handleDelete(todo.id)}
+                  onClick={() => handleDelete(todo._id)}
                   className="flex items-center gap-1 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
                 >
                   <TrashIcon size={16} />

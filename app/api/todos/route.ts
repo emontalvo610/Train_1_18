@@ -1,60 +1,63 @@
-import { getServerSession } from "next-auth";
+// app/api/todos/route.ts
 import { NextResponse } from "next/server";
-import { todos } from "./data";
-import { v4 as uuidv4 } from "uuid";
-import { Todo } from "@/app/types/todo";
-
-// Add this to your environment variables
-const HOOK_SECRET = process.env.AUTH0_HOOK_SECRET;
+import { getServerSession } from "next-auth";
+import dbConnect from "@/app/lib/mongodb";
+import Todo from "@/app/lib/model/Todo";
 
 export async function GET() {
   try {
     const session = await getServerSession();
 
-    if (!session?.user) {
+    if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userTodos = todos.filter(
-      (todo) => todo.userId === session.user?.email
-    );
-    return NextResponse.json({ todos: userTodos }); // Wrap in an object
+    await dbConnect();
+
+    const todos = await Todo.find({ userId: session.user.email }).sort({
+      createdAt: -1,
+    });
+
+    return NextResponse.json(todos);
   } catch (error) {
-    console.error("GET todos error:", error);
+    console.error("Error fetching todos:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Failed to fetch todos" },
       { status: 500 }
     );
   }
 }
 
 export async function POST(request: Request) {
-  console.log("@>>>>>>>>>>>>>>>> Trigger Post");
   try {
-    const hookSecret = request.headers.get("x-auth0-hook-secret");
     const session = await getServerSession();
 
-    if (!session?.user && hookSecret !== HOOK_SECRET) {
+    if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { title, description, userId } = await request.json();
-    console.log("title", title);
-    const actualUserId = userId || session?.user?.email;
+    const body = await request.json();
+    const { title, description } = body;
 
-    const newTodo: Todo = {
-      id: uuidv4(),
-      title,
-      description,
-      userId: actualUserId!,
-    };
+    if (!title || !description) {
+      return NextResponse.json(
+        { error: "Title and description are required" },
+        { status: 400 }
+      );
+    }
 
-    todos.push(newTodo);
-    return NextResponse.json({ todo: newTodo }); // Wrap in an object
+    await dbConnect();
+
+    const todo = await Todo.create({
+      ...body,
+      userId: session.user.email,
+    });
+
+    return NextResponse.json(todo, { status: 201 });
   } catch (error) {
-    console.error("POST todo error:", error);
+    console.error("Error creating todo:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Failed to create todo" },
       { status: 500 }
     );
   }
