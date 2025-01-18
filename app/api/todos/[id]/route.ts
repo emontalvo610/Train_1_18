@@ -1,11 +1,11 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { todos } from "../data";
 
-export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: Request, params: any) {
+  const { id: paramsId } = await params;
   const session = await getServerSession();
 
   if (!session?.user) {
@@ -14,7 +14,7 @@ export async function PUT(
 
   const { title, description } = await request.json();
   const todoIndex = todos.findIndex(
-    (todo) => todo.id === params.id && todo.userId === session.user?.email
+    (todo) => todo.id === paramsId && todo.userId === session.user?.email
   );
 
   if (todoIndex === -1) {
@@ -30,10 +30,8 @@ export async function PUT(
   return NextResponse.json(todos[todoIndex]);
 }
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: Request, params: any) {
+  const { id: paramsId } = await params;
   const session = await getServerSession();
 
   if (!session?.user) {
@@ -41,7 +39,7 @@ export async function DELETE(
   }
 
   const todoIndex = todos.findIndex(
-    (todo) => todo.id === params.id && todo.userId === session.user?.email
+    (todo) => todo.id === paramsId && todo.userId === session.user?.email
   );
 
   if (todoIndex === -1) {
