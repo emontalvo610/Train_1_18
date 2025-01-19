@@ -14,9 +14,13 @@ export async function GET() {
 
     await dbConnect();
 
+    console.log("db connected");
+
     const todos = await Todo.find({ userId: session.user.email }).sort({
       createdAt: -1,
     });
+
+    console.log("todos", todos);
 
     return NextResponse.json(todos);
   } catch (error) {
