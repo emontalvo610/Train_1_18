@@ -18,19 +18,18 @@ const cached: Connection = {
 };
 
 async function dbConnect() {
-  if (cached.conn) {
-    console.log("cached");
-    return cached.conn;
-  }
+  // if (cached.conn) {
+  //   console.log("cached");
+  //   return cached.conn;
+  // }
 
-  if (!cached.promise) {
-    console.log("not cached");
+  // if (!cached.promise) {
+  // console.log("not cached");
 
-    cached.promise = mongoose.connect(MONGODB_URI, {
-      bufferCommands: false,
-      dbName: "test",
-    });
-  }
+  cached.promise = mongoose.connect(MONGODB_URI, {
+    dbName: "test",
+  });
+  // }
 
   try {
     cached.conn = await cached.promise;
