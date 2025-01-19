@@ -1,11 +1,11 @@
 // lib/mongodb.ts
 import mongoose from "mongoose";
 
-if (!process.env.MONGODB_URI) {
+if (!process.env.NEXT_PUBLIC_MONGODB_URI) {
   throw new Error("Please add your MONGODB_URI to .env.local");
 }
 
-const MONGODB_URI: string = process.env.MONGODB_URI;
+const MONGODB_URI: string = process.env.NEXT_PUBLIC_MONGODB_URI;
 
 interface Connection {
   conn: typeof mongoose | null;

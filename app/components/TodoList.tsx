@@ -103,7 +103,7 @@ export default function TodoList() {
   console.log({ todos });
   return (
     <div className="space-y-4">
-      {process.env.MONGODB_URI}
+      {process.env.NEXT_PUBLIC_MONGODB_URI}
       {error && (
         <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
           <div className="flex items-center">
