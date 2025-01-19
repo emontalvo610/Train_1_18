@@ -24,7 +24,6 @@ async function dbConnect() {
   // }
 
   // if (!cached.promise) {
-  // console.log("not cached");
 
   cached.promise = mongoose.connect(MONGODB_URI, {
     dbName: "test",
