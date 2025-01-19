@@ -7,7 +7,7 @@ import Todo from "@/app/lib/model/Todo";
 export async function GET() {
   try {
     const session = await getServerSession();
-
+    console.log("DB try connect");
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
