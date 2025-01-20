@@ -34,15 +34,14 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const body = await request.json();
+    const { title, description, userId } = body;
     const session = await getServerSession();
     console.log("session", session);
 
-    if (!session?.user?.email) {
+    if (!userId || !session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    const body = await request.json();
-    const { title, description } = body;
 
     console.log("title", title);
     console.log("description", description);
@@ -58,7 +57,7 @@ export async function POST(request: Request) {
 
     const todo = await Todo.create({
       ...body,
-      userId: session.user.email,
+      userId: userId || session.user.email,
     });
 
     return NextResponse.json(todo, { status: 201 });
