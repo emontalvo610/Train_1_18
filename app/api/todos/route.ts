@@ -41,9 +41,9 @@ export async function POST(request: Request) {
     console.log("title", title);
     console.log("userId", userId);
 
-    if (!userId || !session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    // if (!userId || !session?.user?.email) {
+    //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // }
 
     if (!title || !description) {
       return NextResponse.json(
