@@ -56,7 +56,7 @@ export async function POST(request: Request) {
 
     const todo = await Todo.create({
       ...body,
-      userId: userId || session.user.email,
+      userId: userId || session?.user?.email,
     });
 
     return NextResponse.json(todo, { status: 201 });
