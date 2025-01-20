@@ -26,9 +26,7 @@ async function dbConnect() {
   // if (!cached.promise) {
 
   cached.promise = mongoose.connect(MONGODB_URI, {
-    dbName: "test",
-    user: "einarmontalvo610",
-    pass: "developer2020!A",
+    dbName: "test"
   });
   // }
 
