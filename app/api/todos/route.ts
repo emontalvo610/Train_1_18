@@ -43,6 +43,9 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { title, description } = body;
 
+    console.log("title", title);
+    console.log("description", description);
+
     if (!title || !description) {
       return NextResponse.json(
         { error: "Title and description are required" },
