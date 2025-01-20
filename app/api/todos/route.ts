@@ -38,13 +38,12 @@ export async function POST(request: Request) {
     const { title, description, userId } = body;
     const session = await getServerSession();
     console.log("session", session);
+    console.log("title", title);
+    console.log("userId", userId);
 
     if (!userId || !session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    console.log("title", title);
-    console.log("description", description);
 
     if (!title || !description) {
       return NextResponse.json(
